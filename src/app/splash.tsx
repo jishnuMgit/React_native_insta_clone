@@ -1,3 +1,4 @@
+import { getSession } from "@/constants/auth";
 import { colors } from "@/constants/theme";
 import { router } from "expo-router";
 import { useEffect } from "react";
@@ -5,8 +6,18 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export default function Splash() {
   useEffect(() => {
-    const timer = setTimeout(() => router.replace("/(tabs)/home"), 1200);
-    return () => clearTimeout(timer);
+    let active = true;
+
+    async function redirectFromSession() {
+      const session = await getSession();
+      if (!active) return;
+      router.replace(session ? "/(tabs)/home" : "/login");
+    }
+
+    redirectFromSession();
+    return () => {
+      active = false;
+    };
   }, []);
   return (
     <View style={styles.container}>
